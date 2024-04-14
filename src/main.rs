@@ -12,9 +12,6 @@ fn main() {
 
     // Defines variable "secret_number" and assigns a random value between 1 and 100
     let secret_number = rand::thread_rng().gen_range(1..=100);
-
-    // Temporary print function to test the number generation (working)
-    println!("The secret number is: {secret_number}");
     
     // Moved main section of game to the inside of a loop so that it doesn't end on one turn
     loop {
@@ -33,7 +30,13 @@ fn main() {
 
         // Converting the "guess" string into an integer and setting failure handling
         // trim is used to eliminate any whitespaces and parse converts the string
-        let guess: u32 = guess.trim().parse().expect("Please type a number!");
+        // Switched from an expect call to "match" expression to handle the error instead of crashing
+        let guess: u32 = match guess.trim().parse() {
+            // if there isn't an error, output the number given
+            Ok(num) => num,
+            // if there is an error, ignore it and continue running the loop
+            Err(_) => continue,
+        };
             
         // Print to the terminal the input from the user
         println!("You guessed: {guess}");
@@ -43,7 +46,11 @@ fn main() {
         match guess.cmp(&secret_number) {
             Ordering::Less => println!("Too small!"),
             Ordering::Greater => println!("Too big!"),
-            Ordering::Equal => println!("Congratulations, you guessed correctly!"),
+            Ordering::Equal => {
+                println!("Congratulations, you guessed correctly!");
+                // Added a break to end the program after correctly guessing the number
+                break;
+            }
         }
     }
 }
